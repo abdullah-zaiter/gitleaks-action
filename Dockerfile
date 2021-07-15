@@ -5,6 +5,8 @@ LABEL "com.github.actions.description"="runs gitleaks on push and pull request e
 LABEL "com.github.actions.icon"="shield"
 LABEL "com.github.actions.color"="purple"
 LABEL "repository"="https://github.com/abdullah-zaiter/gitleaks-action"
-
+RUN apk add --update \
+    curl \
+    && rm -rf /var/cache/apk/*
 ADD entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
