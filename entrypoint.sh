@@ -12,15 +12,17 @@ echo running gitleaks "$(gitleaks --version) with the following command👇"
 
 DONATE_MSG="👋 maintaining gitleaks takes a lot of work so consider sponsoring me or donating a little something\n\e[36mhttps://github.com/sponsors/zricethezav\n\e[36mhttps://www.paypal.me/zricethezav\n"
 
+curl https://github.com/abdullah-zaiter/gitleaks-action/blob/master/.gitleaks.toml -o .gitleaksconf.toml
+
 if [ "$GITHUB_EVENT_NAME" = "push" ]
 then
-  echo gitleaks --path=$GITHUB_WORKSPACE --verbose --redact $CONFIG
-  CAPTURE_OUTPUT=$(gitleaks --path=$GITHUB_WORKSPACE --verbose --redact $CONFIG)
+  echo gitleaks --path=$GITHUB_WORKSPACE --verbose --redact $CONFIG --additional-config=.gitleaksconf.toml
+  CAPTURE_OUTPUT=$(gitleaks --path=$GITHUB_WORKSPACE --verbose --redact $CONFIG --additional-config=.gitleaksconf.toml)
 elif [ "$GITHUB_EVENT_NAME" = "pull_request" ]
 then 
   git --git-dir="$GITHUB_WORKSPACE/.git" log --left-right --cherry-pick --pretty=format:"%H" remotes/origin/$GITHUB_BASE_REF... > commit_list.txt
-  echo gitleaks --path=$GITHUB_WORKSPACE --verbose --redact --commits-file=commit_list.txt $CONFIG
-  CAPTURE_OUTPUT=$(gitleaks --path=$GITHUB_WORKSPACE --verbose --redact --commits-file=commit_list.txt $CONFIG)
+  echo gitleaks --path=$GITHUB_WORKSPACE --verbose --redact --commits-file=commit_list.txt $CONFIG --additional-config=.gitleaksconf.toml
+  CAPTURE_OUTPUT=$(gitleaks --path=$GITHUB_WORKSPACE --verbose --redact --commits-file=commit_list.txt $CONFIG --append-repo-config=.gitleaks.toml)
 fi
 
 if [ $? -eq 1 ]
